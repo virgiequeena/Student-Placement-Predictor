@@ -1,0 +1,95 @@
+import streamlit as st
+import joblib
+import numpy as np
+import pandas as pd
+
+classifier = joblib.load('artifacts/classifier_model.pkl')
+regressor  = joblib.load('artifacts/regressor_model.pkl')
+le         = joblib.load('artifacts/label_encoder.pkl')
+
+def main():
+    st.title('Student Placement Prediction')
+
+    #Sidebar
+    with st.sidebar:
+        st.header("Academic Information")
+        gender = st.selectbox('Gender', ['Male', 'Female'])
+        branch = st.selectbox('Branch', ['CSE', 'ECE', 'IT', 'ME', 'CE', 'EEE', 'Other'])
+        cgpa   = st.number_input('CGPA', 5.0, 10.0, 7.5)
+        tenth_percentage   = st.number_input('10th Percentage', 50.0, 100.0, 75.0)
+        twelfth_percentage = st.number_input('12th Percentage', 50.0, 100.0, 75.0)
+        backlogs           = st.number_input('Backlogs', 0, 5, 0)
+        attendance_percentage = st.number_input('Attendance %', 44.0, 100.0, 75.0)
+
+    #Main
+    col1, col2 = st.columns(2)
+    with col1:
+        st.subheader("Technical Skills")
+        coding_skill_rating        = st.number_input('Coding Skill Rating', 1, 5, 3)
+        aptitude_skill_rating      = st.number_input('Aptitude Skill Rating', 1, 5, 4)
+        communication_skill_rating = st.number_input('Communication Skill Rating', 1, 5, 3)
+        projects_completed         = st.number_input('Projects Completed', 0, 8, 5)
+        internships_completed      = st.number_input('Internships Completed', 0, 4, 2)
+        hackathons_participated    = st.number_input('Hackathons Participated', 0, 6, 3)
+        certifications_count       = st.number_input('Certifications Count', 0, 9, 2)
+
+    with col2:
+        st.subheader("Lifestyle Factors")
+        study_hours_per_day = st.number_input('Study Hours/Day', 0.0, 10.0, 4.0)
+        sleep_hours         = st.number_input('Sleep Hours/Day', 4.0, 9.0, 7.0)
+        stress_level        = st.number_input('Stress Level (1-10)', 1, 10, 5)
+        part_time_job       = st.selectbox('Part-Time Job?', ['No', 'Yes'])
+        internet_access     = st.selectbox('Internet Access?', ['Yes', 'No'])
+        family_income_level = st.selectbox('Family Income Level', ['High', 'Medium', 'Low'])
+        city_tier           = st.selectbox('City Tier', ['Tier 1', 'Tier 2', 'Tier 3'])
+        extracurricular_involvement = st.selectbox('Extracurricular Involvement', ['High', 'Medium', 'Low'])
+
+    if st.button('Make Prediction'):
+        features = {
+            "gender": gender,
+            "branch": branch,
+            "cgpa": cgpa,
+            "tenth_percentage": tenth_percentage,
+            "twelfth_percentage": twelfth_percentage,
+            "backlogs": int(backlogs),
+            "study_hours_per_day": study_hours_per_day,
+            "attendance_percentage": attendance_percentage,
+            "projects_completed": int(projects_completed),
+            "internships_completed": int(internships_completed),
+            "coding_skill_rating": int(coding_skill_rating),
+            "communication_skill_rating": int(communication_skill_rating),
+            "aptitude_skill_rating": int(aptitude_skill_rating),
+            "hackathons_participated": int(hackathons_participated),
+            "certifications_count": int(certifications_count),
+            "sleep_hours": sleep_hours,
+            "stress_level": int(stress_level),
+            "part_time_job": part_time_job,
+            "family_income_level": family_income_level,
+            "city_tier": city_tier,
+            "internet_access": internet_access,
+            "extracurricular_involvement": extracurricular_involvement
+        }
+
+        result = make_prediction(features)
+
+        placement = result["placement_prediction"]
+        salary = result["predicted_salary_lpa"]
+
+        st.subheader("Prediction Results")
+        if placement == "Placed":
+            st.success(f'Congrats! Placement Status: {placement}')
+            st.info(f'Estimated Salary: {salary} LPA')
+        else:
+            st.error(f'Placement Status: {placement}')
+            st.warning('No salary estimate available for students who were not placed.')
+
+
+def make_prediction(features):
+    df = pd.DataFrame([features])
+    placement_label = le.inverse_transform(classifier.predict(df))[0]
+    salary = round(float(regressor.predict(df)[0]), 2) if placement_label == 'Placed' else None
+    return {'placement_prediction': placement_label, 'predicted_salary_lpa': salary}
+
+
+if __name__ == '__main__':
+    main()
