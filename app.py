@@ -16,11 +16,11 @@ def main():
         st.header("Your Academic Information")
         gender = st.selectbox('Gender', ['Male', 'Female'])
         branch = st.selectbox('Branch', ['CSE', 'ECE', 'IT', 'ME', 'CE', 'EEE', 'Other'])
-        cgpa   = st.number_input('CGPA', 5.0, 10.0, 7.5)
-        tenth_percentage   = st.number_input('10th Percentage', 50.0, 100.0, 75.0)
-        twelfth_percentage = st.number_input('12th Percentage', 50.0, 100.0, 75.0)
+        cgpa   = st.number_input('CGPA', 5.0, 10.0, 7.5, step=0.5)
+        tenth_percentage   = st.number_input('10th Percentage', 50.0, 100.0, 75.0, step=0.5)
+        twelfth_percentage = st.number_input('12th Percentage', 50.0, 100.0, 75.0, step=0.5)
         backlogs           = st.number_input('Backlogs', 0, 5, 0)
-        attendance_percentage = st.number_input('Attendance %', 44.0, 100.0, 75.0)
+        attendance_percentage = st.number_input('Attendance %', 44.0, 100.0, 75.0, step=0.5)
 
     #Main Form
     with st.form("prediction_form"):
@@ -37,8 +37,8 @@ def main():
 
         with col2:
             st.subheader("Lifestyle Factors")
-            study_hours_per_day = st.number_input('Study Hours/Day', 0.0, 10.0, 4.0)
-            sleep_hours         = st.number_input('Sleep Hours/Day', 4.0, 9.0, 7.0)
+            study_hours_per_day = st.number_input('Study Hours/Day', 0.0, 10.0, 4.0, step=0.5)
+            sleep_hours         = st.number_input('Sleep Hours/Day', 4.0, 9.0, 7.0, step=0.5)
             stress_level        = st.number_input('Stress Level (1-10)', 1, 10, 5)
             part_time_job       = st.selectbox('Part-Time Job?', ['No', 'Yes'])
             internet_access     = st.selectbox('Internet Access?', ['Yes', 'No'])
@@ -88,7 +88,7 @@ def main():
                 "salary_range": {
                     "Min. Salary": 5.18,
                     "Your Salary": salary,
-                    "Average Salary": 16.5,
+                    "Average Salary": 16.15,
                     "Max Salary": 20.0
                 }
             })
